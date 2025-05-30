@@ -37,8 +37,7 @@ Este projeto implementa um sistema de gerenciamento de campanhas web completo, u
 - **PostgreSQL:** Sistema de gerenciamento de banco de dados relacional (utilizado via Docker Compose).
 - **Zod:** Biblioteca de validação de schemas para entrada de dados.
 - **ShadCN UI:** Componentes acessíveis, estilizados com Tailwind e otimizados para aplicações modernas.
-- **Jest / Vitest:** Framework de testes (para backend e frontend).
-- **React Testing Library:** Utilitários para testar componentes React.
+- **Jest:** Framework de testes (backend).
 - **Docker Compose:** Para orquestrar o banco de dados PostgreSQL.
 
 ## Como Configurar e Executar o Projeto
@@ -94,23 +93,24 @@ Este projeto implementa um sistema de gerenciamento de campanhas web completo, u
     Isso criará as tabelas no seu banco de dados PostgreSQL.
 
 6.  **Inicie a Aplicação Next.js:**
+
     ```bash
     npm run dev
     # ou
     yarn dev
     ```
+
     A aplicação estará disponível em `http://localhost:3000`.
 
 ## Como Executar os Testes
 
 ### Testes de Backend (API Routes)
 
-Para executar os testes unitários/de integração das API Routes:
+Para executar os testes unitários e de integração das rotas da API (backend), utilize o comando:
 
 ```bash
-npm test src/tests/api/
-# ou para todos os testes (se você configurou o jest para encontrar todos)
-# npm test
+npm test
+
 ```
 
 ## 📚 Documentação das Rotas da API
