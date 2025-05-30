@@ -60,7 +60,10 @@ export default function CampanhaForm({
 
   function formatDateForInput(dateString: string): string {
     const date = new Date(dateString);
-    return date.toISOString().split("T")[0];
+    const offsetDate = new Date(
+      date.getTime() - date.getTimezoneOffset() * 60000
+    );
+    return offsetDate.toISOString().slice(0, 16); // Formato: YYYY-MM-DDTHH:MM
   }
 
   const validateForm = (): boolean => {
@@ -222,6 +225,7 @@ export default function CampanhaForm({
           >
             <option value="active">Ativa</option>
             <option value="paused">Pausada</option>
+            <option value="expired">Expirada</option>
           </select>
         </div>
       )}

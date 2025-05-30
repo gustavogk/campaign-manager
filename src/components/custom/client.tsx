@@ -13,10 +13,23 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { PlusCircle } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Label } from "../ui/label";
 
-// Função genérica de fetch
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const traduzirStatus = (status: string) => {
@@ -37,6 +50,8 @@ export default function CampanhasClient() {
   const [editingCampanha, setEditingCampanha] = useState<Campaign | null>(null);
   const [viewingCampanha, setViewingCampanha] = useState<Campaign | null>(null);
   const [activeTab, setActiveTab] = useState("todas");
+  const [dataInicio, setDataInicio] = useState("");
+  const [dataFim, setDataFim] = useState("");
 
   const { data: campanhas = [], mutate } = useSWR<Campaign[]>(
     "/api/campaigns",
@@ -56,7 +71,7 @@ export default function CampanhasClient() {
   const handleExcluirCampanha = async (id: string) => {
     if (window.confirm("Tem certeza que deseja excluir esta campanha?")) {
       await fetch(`/api/campaigns/${id}`, { method: "DELETE" });
-      mutate(); // atualiza a lista
+      mutate();
     }
   };
 
@@ -85,25 +100,136 @@ export default function CampanhasClient() {
     setEditingCampanha(null);
   };
 
+  const categorias = Array.from(new Set(campanhas.map((c) => c.category)));
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState("todas");
   const campanhasFiltradas = campanhas.filter((campanha) => {
-    if (activeTab === "todas") return true;
-    return campanha.status === activeTab;
+    const statusOk = activeTab === "todas" || campanha.status === activeTab;
+    const categoriaOk =
+      categoriaSelecionada === "todas" ||
+      campanha.category === categoriaSelecionada;
+
+    const dataCampanhaInicio = new Date(campanha.startDate);
+    const dataCampanhaFim = new Date(campanha.endDate);
+    const filtroInicioOk =
+      !dataInicio || dataCampanhaInicio >= new Date(dataInicio);
+    const filtroFimOk = !dataFim || dataCampanhaFim <= new Date(dataFim);
+
+    return statusOk && categoriaOk && filtroInicioOk && filtroFimOk;
   });
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList>
-            <TabsTrigger value="todas">Todas</TabsTrigger>
-            <TabsTrigger value="active">Ativas</TabsTrigger>
-            <TabsTrigger value="paused">Pausadas</TabsTrigger>
-            <TabsTrigger value="expired">Expiradas</TabsTrigger>
-          </TabsList>
-        </Tabs>
-        <Button onClick={handleNovaCampanha} className="ml-4">
-          <PlusCircle className="mr-2 h-4 w-4" /> Nova Campanha
-        </Button>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Filtros</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex items-center space-x-2">
+            <Label className="text-sm font-medium">Categoria:</Label>
+            <Select
+              value={categoriaSelecionada}
+              onValueChange={(value) => setCategoriaSelecionada(value)}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Selecione uma categoria" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todas">Todas</SelectItem>
+                {categorias.map((cat) => (
+                  <SelectItem key={cat} value={cat}>
+                    {cat}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-2">
+            <Label className="text-sm font-medium">Data de Início:</Label>
+            <input
+              type="date"
+              className="border rounded-md px-3 py-1 text-sm h-10"
+              value={dataInicio}
+              onChange={(e) => setDataInicio(e.target.value)}
+            />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Label className="text-sm font-medium">Data de Fim:</Label>
+            <input
+              type="date"
+              className="border rounded-md px-3 py-1 text-sm h-10"
+              value={dataFim}
+              onChange={(e) => setDataFim(e.target.value)}
+            />
+          </div>
+
+          <div className="flex space-x-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setCategoriaSelecionada("todas");
+                setDataInicio("");
+                setDataFim("");
+              }}
+              className="mt-2 md:mt-0"
+            >
+              Limpar Filtros
+            </Button>
+
+            <Button onClick={handleNovaCampanha} className="mt-2 md:mt-0">
+              <PlusCircle className="mr-2 h-4 w-4" /> Nova Campanha
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: "Todas", value: "todas", color: "text-blue-600" },
+          { label: "Ativas", value: "active", color: "text-green-600" },
+          { label: "Pausadas", value: "paused", color: "text-yellow-600" },
+          { label: "Expiradas", value: "expired", color: "text-red-600" },
+        ].map((tab) => {
+          const count = campanhas.filter((campanha) => {
+            const statusOk =
+              tab.value === "todas" || campanha.status === tab.value;
+            const categoriaOk =
+              categoriaSelecionada === "todas" ||
+              campanha.category === categoriaSelecionada;
+
+            const dataCampanhaInicio = new Date(campanha.startDate);
+            const dataCampanhaFim = new Date(campanha.endDate);
+            const filtroInicioOk =
+              !dataInicio || dataCampanhaInicio >= new Date(dataInicio);
+            const filtroFimOk =
+              !dataFim || dataCampanhaFim <= new Date(dataFim);
+
+            return statusOk && categoriaOk && filtroInicioOk && filtroFimOk;
+          }).length;
+
+          return (
+            <Card
+              key={tab.value}
+              className={`cursor-pointer hover:shadow-lg transition-shadow ${
+                activeTab === tab.value ? "ring-2 ring-primary" : ""
+              }`}
+              onClick={() => setActiveTab(tab.value)}
+            >
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">
+                  {tab.label}
+                </CardTitle>
+                <CardDescription>
+                  Clique para ver campanhas{" "}
+                  {tab.label !== "Todas" ? tab.label : ""}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className={`text-2xl font-bold ${tab.color}`}>{count}</p>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -118,7 +244,6 @@ export default function CampanhasClient() {
         ))}
       </div>
 
-      {/* Modal de criar/editar */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
@@ -134,7 +259,6 @@ export default function CampanhasClient() {
         </DialogContent>
       </Dialog>
 
-      {/* Modal de visualização */}
       <Dialog
         open={!!viewingCampanha}
         onOpenChange={() => setViewingCampanha(null)}
