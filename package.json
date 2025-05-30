@@ -15,10 +15,8 @@
     "@radix-ui/react-select": "^2.2.5",
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-tabs": "^1.1.12",
-    "@tanstack/react-query": "^5.79.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "date-fns": "^4.1.0",
     "lucide-react": "^0.511.0",
     "next": "15.3.3",
     "prisma": "^6.8.2",
@@ -31,7 +29,6 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
-    "@types/date-fns": "^2.5.3",
     "@types/node": "^20.17.52",
     "@types/react": "^19",
     "@types/react-dom": "^19",
