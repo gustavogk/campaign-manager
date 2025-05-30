@@ -24,8 +24,8 @@ Este projeto implementa um sistema de gerenciamento de campanhas web completo, u
 - **Listar todas as campanhas:** Página principal que exibe uma lista das campanhas ativas, com informações essenciais.
 - **Criar uma nova campanha:** Formulário para adicionar novas campanhas, com validações de campos.
 - **Editar uma campanha existente:** Formulário preenchido com dados da campanha selecionada para edição.
-- **Excluir uma campanha:** Botão de exclusão (soft delete) na página de detalhes.
-- **Exibir detalhes de uma campanha:** Página dedicada para ver todas as informações de uma campanha específica.
+- **Excluir uma campanha:** Botão de exclusão (soft delete).
+- **Exibir detalhes de uma campanha:** Funcionalidade dedicada para ver todas as informações de uma campanha específica.
 
 ## Tecnologias Utilizadas
 
