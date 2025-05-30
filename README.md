@@ -36,7 +36,7 @@ Este projeto implementa um sistema de gerenciamento de campanhas web completo, u
 - **Prisma:** ORM para interação com o banco de dados.
 - **PostgreSQL:** Sistema de gerenciamento de banco de dados relacional (utilizado via Docker Compose).
 - **Zod:** Biblioteca de validação de schemas para entrada de dados.
-- **date-fns:** Biblioteca para manipulação e formatação de datas.
+- **ShadCN UI:** Componentes acessíveis, estilizados com Tailwind e otimizados para aplicações modernas.
 - **Jest / Vitest:** Framework de testes (para backend e frontend).
 - **React Testing Library:** Utilitários para testar componentes React.
 - **Docker Compose:** Para orquestrar o banco de dados PostgreSQL.
@@ -54,7 +54,7 @@ Este projeto implementa um sistema de gerenciamento de campanhas web completo, u
 1.  **Clone o Repositório:**
 
     ```bash
-    git clone <URL_DO_SEU_REPOSITORIO>
+    git clone https://github.com/gustavogk/campaign-manager
     cd campaign-manager
     ```
 
@@ -112,3 +112,105 @@ npm test src/tests/api/
 # ou para todos os testes (se você configurou o jest para encontrar todos)
 # npm test
 ```
+
+## 📚 Documentação das Rotas da API
+
+### 🔹 GET /api/campaigns
+
+- Lista todas as campanhas ativas (ou seja, que **não** possuem `deletedAt`).
+- O campo `status` pode retornar `"expired"` dinamicamente se a `endDate` for anterior à data atual.
+
+Resposta de exemplo:
+```json
+[
+  {
+    "id": "uuid",
+    "name": "Campanha de Produto",
+    "createdAt": "2025-05-01T10:00:00.000Z",
+    "startDate": "2025-05-01T00:00:00.000Z",
+    "endDate": "2025-06-01T00:00:00.000Z",
+    "status": "active",
+    "category": "product"
+  }
+]
+```
+
+---
+
+### 🔹 POST /api/campaigns
+
+- Cria uma nova campanha.
+- Campos obrigatórios: `name`, `startDate`, `endDate`, `category`.
+- `status` é opcional e, por padrão, será `"active"`.
+
+Body JSON de exemplo:
+```json
+{
+  "name": "Lançamento de Novo Produto",
+  "startDate": "2025-06-01T00:00:00.000Z",
+  "endDate": "2025-06-30T00:00:00.000Z",
+  "category": "product",
+  "status": "active"
+}
+```
+
+Enums válidos:
+
+- `status`: `"active"`, `"paused"`, `"expired"`
+- `category`: `"marketing"`, `"sales"`, `"product"`, `"events"`, `"other"`
+
+---
+
+### 🔹 GET /api/campaigns/:id
+
+- Retorna os detalhes de uma campanha pelo `id`.
+- Retorna erro `404` se a campanha não existir ou estiver "soft deleted".
+
+Resposta de exemplo:
+```json
+{
+  "id": "uuid",
+  "name": "Campanha de Marketing",
+  "createdAt": "2025-04-15T10:00:00.000Z",
+  "startDate": "2025-05-01T00:00:00.000Z",
+  "endDate": "2025-05-31T00:00:00.000Z",
+  "status": "expired",
+  "category": "marketing"
+}
+```
+
+---
+
+### 🔹 PUT /api/campaigns/:id
+
+- Atualiza os dados de uma campanha existente.
+- Todos os campos podem ser atualizados, exceto `id` e `createdAt`.
+- Retorna erro `404` se a campanha não for encontrada.
+
+Body JSON de exemplo:
+```json
+{
+  "name": "Campanha Atualizada",
+  "startDate": "2025-06-10T00:00:00.000Z",
+  "endDate": "2025-07-10T00:00:00.000Z",
+  "status": "paused",
+  "category": "sales"
+}
+```
+
+---
+
+### 🔹 DELETE /api/campaigns/:id
+
+- Realiza um **soft delete** da campanha, atribuindo um valor ao campo `deletedAt`.
+- A campanha deixa de aparecer nas listagens, mas permanece no banco.
+- Retorna 200 se bem-sucedido, 404 se não encontrada.
+
+Resposta de sucesso:
+```json
+{
+  "message": "Campanha excluída com sucesso (soft delete)."
+}
+```
+
+
