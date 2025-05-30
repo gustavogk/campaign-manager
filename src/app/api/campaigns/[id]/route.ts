@@ -8,7 +8,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const campaign = await prisma.campaign.findUnique({
       where: { id, deletedAt: null },
     });
@@ -101,7 +101,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const existingCampaign = await prisma.campaign.findUnique({
       where: { id, deletedAt: null },
